@@ -1,0 +1,42 @@
+static_resources:
+  listeners:
+    - address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8090
+      filter_chains:
+        - filters:
+            - name: envoy.http_connection_manager
+              config:
+                codec_type: auto
+                stat_prefix: ingress_http
+                route_config:
+                  virtual_hosts:
+                    - name: http_dev_micro_front_ends
+                      domains:
+                        - "*"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: main-app-cluster
+                http_filters:
+                  - name: envoy.router
+                    config: {}
+
+  clusters:
+    - name: main-app-cluster
+      connect_timeout: 0.250s
+      type: STRICT_DNS
+      lb_policy: round_robin
+      hosts:
+        - socket_address:
+            address: rest-api
+            port_value: 4000
+
+admin:
+  access_log_path: "/dev/null"
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 8001

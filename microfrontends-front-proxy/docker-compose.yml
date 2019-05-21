@@ -1,0 +1,47 @@
+version: '3.3'
+
+services:
+  micro-front-ends:
+    image: micro-front-ends-front-proxy
+    build: .
+    ports:
+      - 8090:8090
+      - 8010:8010
+    networks:
+      - test-app
+  # redis:
+  #   image: redis:4.0.5-alpine 
+  #   ports:
+  #     - 6379:6379    
+  #   volumes:
+  #     - ./redis.conf:/usr/local/etc/redis/redis.conf
+  #   command:
+  #     - /usr/local/etc/redis/redis.conf
+  #   networks:
+  #     - test-app
+  rest-api:
+    image: rest-api
+    build:
+      context: ../rest-api
+      dockerfile: Dockerfile
+    restart: always  
+    deploy:
+      endpoint_mode: dnsrr
+      replicas: 1
+    command: sh -c "(envoy -c envoy.yaml --service-cluster 'rest-api' &)  && node server.js"
+    networks:
+      - test-app
+  single-pass:
+    image: single-pass
+    build:
+      context: ../single-pass
+      dockerfile: Dockerfile
+    restart: always  
+    deploy:
+      endpoint_mode: dnsrr
+      replicas: 1
+    command: sh -c "(envoy -c envoy.yaml --service-cluster 'single-pass' &)  && node server.js"
+    networks:
+      - test-app
+networks:
+  test-app:

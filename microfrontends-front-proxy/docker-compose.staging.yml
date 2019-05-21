@@ -1,0 +1,7 @@
+version: '3.3'
+
+services:
+  vibzer-web:
+    image: 192.168.0.176:5000/vibzer-front-proxy:staging
+    build: .
+ 
