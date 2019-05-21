@@ -1,9 +1,4 @@
-stats_sinks:
-  -
-    name: "envoy.statsd"
-    config:
-      tcp_cluster_name: "statsd-exporter"
-      prefix: single-pass  
+
 admin:
   access_log_path: "/tmp/admin_access.log"
   address:
@@ -25,11 +20,6 @@ static_resources:
             -
               name: "envoy.http_connection_manager"
               config:
-                access_log:
-                - name: envoy.file_access_log
-                  config:
-                    path: /dev/stdout
-                    format: "[ACCESS_LOG][%START_TIME%] \"%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%\" %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED% %BYTES_SENT% %DURATION% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)% \"%REQ(X-FORWARDED-FOR)%\" \"%REQ(USER-AGENT)%\" \"%REQ(X-REQUEST-ID)%\" \"%REQ(:AUTHORITY)%\" \"%UPSTREAM_HOST%\" \"%DOWNSTREAM_REMOTE_ADDRESS_WITHOUT_PORT%\"\n"
                 stat_prefix: "ingress_8786"
                 codec_type: "AUTO"
                 route_config:
@@ -49,16 +39,6 @@ static_resources:
                   -
                     name: "envoy.router"                            
   clusters:
-      -
-        name: "statsd-exporter"
-        connect_timeout: "0.25s"
-        type: "strict_dns"
-        lb_policy: "ROUND_ROBIN"
-        hosts:
-          -
-            socket_address:
-              address: "statsd_exporter"
-              port_value: 9125
       -
         name: "single-pass"
         connect_timeout: "0.25s"
